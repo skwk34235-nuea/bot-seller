@@ -1,0 +1,718 @@
+ <!doctype html>
+<html lang="th" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= appName %></title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&amp;family=Sarabun:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+  <script>
+tailwind.config={theme:{extend:{fontFamily:{orbit:['Orbitron','sans-serif'],sara:['Sarabun','sans-serif']},colors:{neon:'#00d4ff',neon2:'#7b5cff',deep:'#0a0e27',deep2:'#111640',glass:'rgba(17,22,64,0.6)'}}}}
+</script>
+  <script src="/js/translations.js"></script>
+  <style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+#app{height:100%;overflow-y:auto;overflow-x:hidden}
+.stars{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle var(--d) infinite alternate}
+@keyframes twinkle{0%{opacity:.2;transform:scale(.8)}100%{opacity:1;transform:scale(1.2)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes glow-pulse{0%,100%{box-shadow:0 0 15px rgba(0,212,255,.3),0 0 30px rgba(0,212,255,.1)}50%{box-shadow:0 0 25px rgba(0,212,255,.5),0 0 50px rgba(0,212,255,.2)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideLeft{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideRight{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes zoomIn{from{opacity:0;transform:scale(0.85)}to{opacity:1;transform:scale(1)}}
+@keyframes flipIn{from{opacity:0;transform:perspective(500px) rotateX(-90deg)}to{opacity:1;transform:perspective(500px) rotateX(0deg)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.glow-btn{background:linear-gradient(135deg,#00d4ff,#7b5cff);animation:glow-pulse 3s infinite;transition:all .3s}
+.glow-btn:hover{transform:scale(1.05);box-shadow:0 0 40px rgba(0,212,255,.6)}
+.glass-card{background:rgba(17,22,64,0.55);backdrop-filter:blur(16px);border:1px solid rgba(0,212,255,.15);transition:all .4s}
+.glass-card:hover{border-color:rgba(0,212,255,.4);transform:translateY(-4px);box-shadow:0 8px 32px rgba(0,212,255,.15)}
+.nav-link{position:relative;transition:color .3s}
+.nav-link::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:linear-gradient(90deg,#00d4ff,#7b5cff);transition:width .3s}
+.nav-link:hover::after,.nav-link.active::after{width:100%}
+.anim-up{animation:slideUp .6s cubic-bezier(0.16,1,0.3,1) both}
+.anim-down{animation:slideDown .6s cubic-bezier(0.16,1,0.3,1) both}
+.anim-left{animation:slideLeft .6s cubic-bezier(0.16,1,0.3,1) both}
+.anim-right{animation:slideRight .6s cubic-bezier(0.16,1,0.3,1) both}
+.anim-zoom{animation:zoomIn .6s cubic-bezier(0.16,1,0.3,1) both}
+.anim-flip{animation:flipIn .6s cubic-bezier(0.16,1,0.3,1) both}
+.anim-fade{animation:fadeIn .6s cubic-bezier(0.16,1,0.3,1) both}
+.tag{background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.25);color:#00d4ff;font-size:.7rem;padding:2px 8px;border-radius:9999px}
+.star-rating i{cursor:pointer;transition:all .2s}
+.ticket-status{display:inline-block;padding:2px 10px;border-radius:9999px;font-size:.7rem;font-weight:600}
+.status-pending{background:rgba(255,193,7,.15);color:#ffc107;border:1px solid rgba(255,193,7,.3)}
+.status-checked{background:rgba(0,212,255,.15);color:#00d4ff;border:1px solid rgba(0,212,255,.3)}
+.status-done{background:rgba(76,175,80,.15);color:#4caf50;border:1px solid rgba(76,175,80,.3)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s}
+.toast{position:fixed;top:20px;right:20px;z-index:200;padding:12px 20px;border-radius:12px;animation:slideUp .3s ease-out;font-family:'Sarabun',sans-serif}
+input,textarea,select{background:rgba(10,14,39,.8)!important;border:1px solid rgba(0,212,255,.2)!important;color:#e0e6ff!important;border-radius:8px!important;padding:8px 12px!important;font-family:'Sarabun',sans-serif!important;width:100%}
+input:focus,textarea:focus,select:focus{outline:none!important;border-color:#00d4ff!important;box-shadow:0 0 12px rgba(0,212,255,.2)!important}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0a0e27}
+::-webkit-scrollbar-thumb{background:linear-gradient(#00d4ff,#7b5cff);border-radius:3px}
+.nebula{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;opacity:.15}
+</style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full bg-deep text-gray-200 font-sara">
+  <div class="stars" id="stars"></div>
+  <div class="nebula" style="width:500px;height:500px;top:-100px;left:-100px;background:radial-gradient(circle,#7b5cff,transparent)"></div>
+  <div class="nebula" style="width:400px;height:400px;bottom:-50px;right:-80px;background:radial-gradient(circle,#00d4ff,transparent)"></div>
+  <div id="app" class="h-full relative z-10"><!-- Nav -->
+   <nav id="mainNav" class="sticky top-0 z-50 backdrop-blur-xl bg-deep/80 border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+     <div class="flex items-center gap-2 cursor-pointer" onclick="navigate('home')">
+      <div class="w-8 h-8 rounded-lg glow-btn flex items-center justify-center">
+       <i data-lucide="bot" style="width:18px;height:18px;color:#fff"></i>
+      </div><span id="navTitle" class="font-orbit font-bold text-sm text-neon hidden sm:block">Starlight Bot Store</span>
+     </div>
+     <div class="hidden md:flex items-center gap-6"><a class="nav-link text-sm cursor-pointer" data-nav="home" onclick="navigate('home')" data-i18n="nav_home">หน้าแรก</a> <a class="nav-link text-sm cursor-pointer" data-nav="products" onclick="navigate('products')" data-i18n="nav_products">สินค้า</a> <a class="nav-link text-sm cursor-pointer" data-nav="plans" onclick="navigate('plans')" data-i18n="nav_plans">แพ็กเกจ</a> <a class="nav-link text-sm cursor-pointer" data-nav="portfolio" onclick="navigate('portfolio')" data-i18n="nav_portfolio">ผลงาน</a> <a class="nav-link text-sm cursor-pointer" data-nav="reviews" onclick="navigate('reviews')" data-i18n="nav_reviews">รีวิว</a> <a class="nav-link text-sm cursor-pointer" data-nav="faq" onclick="navigate('faq')" data-i18n="nav_faq">FAQ</a> <a class="nav-link text-sm cursor-pointer" data-nav="contact" onclick="navigate('contact')" data-i18n="nav_contact">ติดต่อ</a>
+     </div>
+     <div class="flex items-center gap-2">
+      <button onclick="toggleLang()" class="text-xs px-3 py-1.5 rounded-lg border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 transition flex items-center gap-1 font-bold"><i data-lucide="globe" style="width:14px;height:14px;"></i> <span id="langLabel">EN</span></button>
+      <button onclick="navigate('support')" class="text-xs px-3 py-1.5 rounded-lg border border-neon/30 text-neon hover:bg-neon/10 transition hidden sm:block" data-i18n="nav_support">Support</button> <button onclick="navigate('admin')" class="text-xs px-3 py-1.5 rounded-lg bg-neon2/20 text-purple-300 border border-neon2/30 hover:bg-neon2/30 transition" data-i18n="nav_admin">Admin</button> <button id="mobileMenuBtn" class="md:hidden p-1.5 rounded-lg border border-white/10" onclick="toggleMobileMenu()"><i data-lucide="menu" style="width:18px;height:18px"></i></button>
+     </div>
+    </div>
+    <div id="mobileMenu" class="hidden md:hidden px-4 pb-3 space-y-2 border-t border-white/5 pt-3"><a class="block text-sm py-1.5 nav-link cursor-pointer" onclick="navigate('home');toggleMobileMenu()" data-i18n="nav_home">หน้าแรก</a> <a class="block text-sm py-1.5 nav-link cursor-pointer" onclick="navigate('products');toggleMobileMenu()" data-i18n="nav_products">สินค้า</a> <a class="block text-sm py-1.5 nav-link cursor-pointer" onclick="navigate('plans');toggleMobileMenu()" data-i18n="nav_plans">แพ็กเกจ</a> <a class="block text-sm py-1.5 nav-link cursor-pointer" onclick="navigate('portfolio');toggleMobileMenu()" data-i18n="nav_portfolio">ผลงาน</a> <a class="block text-sm py-1.5 nav-link cursor-pointer" onclick="navigate('reviews');toggleMobileMenu()" data-i18n="nav_reviews">รีวิว</a> <a class="block text-sm py-1.5 nav-link cursor-pointer" onclick="navigate('faq');toggleMobileMenu()" data-i18n="nav_faq">FAQ</a> <a class="block text-sm py-1.5 nav-link cursor-pointer" onclick="navigate('contact');toggleMobileMenu()" data-i18n="nav_contact">ติดต่อ</a> <a class="block text-sm py-1.5 nav-link cursor-pointer" onclick="navigate('support');toggleMobileMenu()" data-i18n="nav_support">Support</a>
+    </div>
+   </nav><!-- Pages Container -->
+   <div id="pageContainer"></div><!-- Footer -->
+   <footer class="border-t border-white/5 bg-deep/90 backdrop-blur-sm mt-12">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-gray-400">
+      <div>
+       <h4 class="font-orbit text-neon text-xs mb-3">STARLIGHT BOT STORE</h4>
+       <p class="text-xs leading-relaxed" data-i18n="ft_desc">ร้านขาย Discord Bot คุณภาพสูง พร้อมบริการดูแลและซัพพอร์ตตลอด</p>
+      </div>
+      <div>
+       <h4 class="font-orbit text-xs mb-3 text-gray-300" data-i18n="ft_links">LINKS</h4>
+       <div class="space-y-1 text-xs"><a class="block hover:text-neon cursor-pointer transition" onclick="navigate('products')" data-i18n="nav_products">สินค้า</a> <a class="block hover:text-neon cursor-pointer transition" onclick="navigate('plans')" data-i18n="nav_plans">แพ็กเกจ</a> <a class="block hover:text-neon cursor-pointer transition" onclick="navigate('tos')">Terms of Service</a>
+       </div>
+      </div>
+      <div>
+       <h4 class="font-orbit text-xs mb-3 text-gray-300" data-i18n="ft_contact">CONTACT</h4>
+       <div class="space-y-1 text-xs">
+        <p>Discord: starlight#0001</p>
+        <p>Line: @starlightbot</p>
+        <p>Facebook: Starlight Bot Store</p>
+       </div>
+      </div>
+     </div>
+     <div class="mt-6 pt-4 border-t border-white/5 text-center text-xs text-gray-500" data-i18n="ft_rights">
+      © 2025 Starlight Bot Store. All rights reserved.
+     </div>
+    </div>
+   </footer>
+  </div><!-- Toast Container -->
+  <div id="toastContainer"></div>
+  <script>
+let currentLang = localStorage.getItem('lang') || 'th';
+function t(key) { return (translations[currentLang] && translations[currentLang][key]) || key; }
+function toggleLang() {
+  currentLang = currentLang === 'th' ? 'en' : 'th';
+  localStorage.setItem('lang', currentLang);
+  document.getElementById('langLabel').textContent = currentLang === 'th' ? 'EN' : 'TH';
+  initData();
+  updateTranslations();
+  navigate(currentPage);
+}
+function updateTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    let key = el.dataset.i18n;
+    if(el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = t(key);
+    else el.innerHTML = t(key);
+  });
+}
+
+// Data
+let products = [];
+let plans = [];
+let reviews = [];
+let portfolio = [];
+let faqs = [];
+
+function initData() {
+  products = [
+    {id:1,name:'Melody Bot',cat:'music',price:1500,desc:t('p1_desc'),features:[t('p1_f1'),t('p1_f2'),t('p1_f3'),t('p1_f4')],icon:'music',color:'#00d4ff'},
+    {id:2,name:'Harmony DJ',cat:'music',price:2500,desc:t('p2_desc'),features:[t('p2_f1'),t('p2_f2'),t('p2_f3'),t('p2_f4')],icon:'headphones',color:'#7b5cff'},
+    {id:3,name:'Guardian Shield',cat:'security',price:2000,desc:t('p3_desc'),features:[t('p3_f1'),t('p3_f2'),t('p3_f3'),t('p3_f4')],icon:'shield',color:'#00ff88'},
+    {id:4,name:'Sentinel Pro',cat:'security',price:3500,desc:t('p4_desc'),features:[t('p4_f1'),t('p4_f2'),t('p4_f3'),t('p4_f4')],icon:'lock',color:'#ff6b6b'},
+    {id:5,name:'FlowMaster',cat:'workflow',price:1800,desc:t('p5_desc'),features:[t('p5_f1'),t('p5_f2'),t('p5_f3'),t('p5_f4')],icon:'workflow',color:'#ffc107'},
+    {id:6,name:'TaskBot Pro',cat:'workflow',price:2800,desc:t('p6_desc'),features:[t('p6_f1'),t('p6_f2'),t('p6_f3'),t('p6_f4')],icon:'clipboard-list',color:'#ff8a65'},
+    {id:7,name:'Custom Bot Basic',cat:'custom',price:3000,desc:t('p7_desc'),features:[t('p7_f1'),t('p7_f2'),t('p7_f3'),t('p7_f4')],icon:'wrench',color:'#e040fb'},
+    {id:8,name:'Custom Bot Premium',cat:'custom',price:8000,desc:t('p8_desc'),features:[t('p8_f1'),t('p8_f2'),t('p8_f3'),t('p8_f4')],icon:'sparkles',color:'#00e5ff'}
+  ];
+
+  plans = [
+    {id:'src',name:t('pl1_name'),price:t('pl1_price'),desc:t('pl1_desc'),features:[t('pl1_f1'),t('pl1_f2'),t('pl1_f3'),t('pl1_f4')],icon:'code-2',accent:'#00d4ff'},
+    {id:'full',name:t('pl2_name'),price:t('pl2_price'),desc:t('pl2_desc'),features:[t('pl2_f1'),t('pl2_f2'),t('pl2_f3'),t('pl2_f4')],icon:'server',accent:'#7b5cff',popular:true},
+    {id:'transfer',name:t('pl3_name'),price:t('pl3_price'),desc:t('pl3_desc'),features:[t('pl3_f1'),t('pl3_f2'),t('pl3_f3'),t('pl3_f4')],icon:'send',accent:'#00ff88'},
+    {id:'yearly',name:t('pl4_name'),price:t('pl4_price'),desc:t('pl4_desc'),features:[t('pl4_f1'),t('pl4_f2'),t('pl4_f3'),t('pl4_f4')],icon:'calendar',accent:'#ffc107'}
+  ];
+
+  reviews = [
+    {name:'Darkside_TH',avatar:'🌙',rating:5,text:t('r1_text'),bot:'Melody Bot'},
+    {name:'NeonGamer',avatar:'🎮',rating:5,text:t('r2_text'),bot:'Guardian Shield'},
+    {name:'CodingKruPP',avatar:'💻',rating:4,text:t('r3_text'),bot:'Custom Bot Premium'},
+    {name:'SakuraChii',avatar:'🌸',rating:5,text:t('r4_text'),bot:'FlowMaster'},
+    {name:'ByteWolf',avatar:'🐺',rating:5,text:t('r5_text'),bot:'Harmony DJ'}
+  ];
+
+  portfolio = [
+    {name:'Mega Server Bot',desc:t('po1_desc'),tags:['Auto-Mod','Leveling','Economy'],color:'#00d4ff'},
+    {name:'E-Commerce Bot',desc:t('po2_desc'),tags:['Shop','Payment','Inventory'],color:'#7b5cff'},
+    {name:'Esports Tournament',desc:t('po3_desc'),tags:['Tournament','Bracket','Score'],color:'#00ff88'},
+    {name:'Community Manager',desc:t('po4_desc'),tags:['Moderation','Analytics','Engagement'],color:'#ffc107'}
+  ];
+
+  faqs = [
+    {q:t('f1_q'),a:t('f1_a')},
+    {q:t('f2_q'),a:t('f2_a')},
+    {q:t('f3_q'),a:t('f3_a')},
+    {q:t('f4_q'),a:t('f4_a')},
+    {q:t('f5_q'),a:t('f5_a')}
+  ];
+}
+initData();
+
+let currentPage='home';
+let orders=[];
+let tickets=[];
+let cart=null;
+let adminLoggedIn=false;
+
+// Toast
+function showToast(msg,type='success'){
+  const c=document.getElementById('toastContainer');
+  const t=document.createElement('div');
+  t.className=`toast glass-card text-sm ${type==='error'?'border-red-500/50 text-red-300':'border-neon/50 text-neon'}`;
+  t.textContent=msg;
+  c.appendChild(t);
+  setTimeout(()=>t.remove(),3000);
+}
+
+// Navigation
+function navigate(page,data){
+  currentPage=page;
+  document.querySelectorAll('.nav-link').forEach(l=>{l.classList.remove('active');if(l.dataset.nav===page)l.classList.add('active')});
+  const container=document.getElementById('pageContainer');
+  container.innerHTML=pages[page]?pages[page](data):'';
+  container.querySelectorAll('.stagger-item').forEach((el,i)=>{el.style.animationDelay=`${i*0.06}s`});
+  document.getElementById('app').scrollTo({top:0,behavior:'smooth'});
+  lucide.createIcons();
+}
+
+function toggleMobileMenu(){document.getElementById('mobileMenu').classList.toggle('hidden')}
+
+// Page Templates
+const pages={
+home:()=>`
+<section class="relative px-4 py-16 md:py-24 text-center max-w-5xl mx-auto stagger-item anim-zoom">
+  <div style="animation:float 4s ease-in-out infinite" class="mb-6">
+    <div class="w-20 h-20 mx-auto rounded-2xl glow-btn flex items-center justify-center mb-6"><i data-lucide="bot" style="width:40px;height:40px;color:#fff"></i></div>
+  </div>
+  <h1 id="heroTitle" class="font-orbit text-3xl md:text-5xl font-black mb-4 bg-gradient-to-r from-neon via-purple-400 to-neon bg-clip-text text-transparent">Starlight Bot Store</h1>
+  <p id="heroSub" class="text-gray-400 text-sm md:text-base max-w-xl mx-auto mb-8">${t('hero_sub')}</p>
+  <div class="flex flex-wrap justify-center gap-3">
+    <button onclick="navigate('products')" class="glow-btn px-6 py-2.5 rounded-xl text-sm font-bold text-white font-orbit">${t('btn_view_products')}</button>
+    <button onclick="navigate('plans')" class="px-6 py-2.5 rounded-xl text-sm font-bold border border-neon/40 text-neon hover:bg-neon/10 transition">${t('btn_view_plans')}</button>
+  </div>
+</section>
+<section class="px-4 max-w-6xl mx-auto mb-12">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    ${[{icon:'music',title:t('feat_music_title'),desc:t('feat_music_desc'),c:'#00d4ff'},{icon:'shield',title:t('feat_sec_title'),desc:t('feat_sec_desc'),c:'#00ff88'},{icon:'sparkles',title:t('feat_custom_title'),desc:t('feat_custom_desc'),c:'#7b5cff'}].map((s,i)=>`
+    <div class="glass-card rounded-2xl p-6 text-center stagger-item anim-up cursor-pointer" onclick="navigate('products')">
+      <div class="w-12 h-12 mx-auto rounded-xl flex items-center justify-center mb-3" style="background:${s.c}20;border:1px solid ${s.c}40">
+        <i data-lucide="${s.icon}" style="width:22px;height:22px;color:${s.c}"></i>
+      </div>
+      <h3 class="font-orbit text-sm font-bold mb-1" style="color:${s.c}">${s.title}</h3>
+      <p class="text-xs text-gray-400">${s.desc}</p>
+    </div>`).join('')}
+  </div>
+</section>
+<section class="px-4 max-w-6xl mx-auto mb-12 stagger-item anim-up">
+  <h2 class="font-orbit text-lg text-center mb-6 text-gray-200">${t('review_title')}</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    ${reviews.slice(0,3).map(r=>`
+    <div class="glass-card rounded-xl p-4">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-2xl">${r.avatar}</span>
+        <div><p class="text-sm font-bold">${r.name}</p><p class="text-xs text-gray-500">${r.bot}</p></div>
+      </div>
+      <div class="flex gap-0.5 mb-2">${'★'.repeat(r.rating).split('').map(()=>'<span class="text-yellow-400 text-xs">★</span>').join('')}</div>
+      <p class="text-xs text-gray-300">"${r.text}"</p>
+    </div>`).join('')}
+  </div>
+  <div class="text-center mt-4"><button onclick="navigate('reviews')" class="text-xs text-neon hover:underline">${t('review_view_all')}</button></div>
+</section>
+<section class="px-4 max-w-4xl mx-auto mb-12 stagger-item anim-up">
+  <div class="glass-card rounded-2xl p-6 md:p-8 text-center">
+    <h2 class="font-orbit text-lg mb-2 text-neon">${t('demo_title')}</h2>
+    <p class="text-xs text-gray-400 mb-4">${t('demo_desc')}</p>
+    <button class="glow-btn px-6 py-2 rounded-xl text-sm font-bold text-white">${t('demo_btn')}</button>
+  </div>
+</section>`,
+
+products:(filter)=>{
+  const cats=[{id:'all',name:t('prod_cat_all')},{id:'music',name:t('prod_cat_music')},{id:'security',name:t('prod_cat_sec')},{id:'workflow',name:t('prod_cat_workflow')},{id:'custom',name:t('prod_cat_custom')}];
+  const activeCat=filter||'all';
+  const filtered=activeCat==='all'?products:products.filter(p=>p.cat===activeCat);
+  const animStyles={'music':'anim-left','security':'anim-flip','workflow':'anim-zoom','custom':'anim-down','all':'anim-up'};
+  const animClass = animStyles[activeCat] || 'anim-up';
+  return`
+<section class="px-4 max-w-6xl mx-auto py-10">
+  <h1 class="font-orbit text-2xl text-center mb-6 stagger-item anim-fade">${t('prod_title')}</h1>
+  <div class="flex flex-wrap justify-center gap-2 mb-8 stagger-item anim-fade">
+    ${cats.map(c=>`<button data-cat="${c.id}" onclick="filterProducts('${c.id}')" class="category-btn px-4 py-1.5 rounded-full text-xs font-bold transition ${activeCat===c.id?'glow-btn text-white':'border border-white/10 text-gray-400 hover:border-neon/40 hover:text-neon'}">${c.name}</button>`).join('')}
+  </div>
+  <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    ${filtered.map((p,i)=>`
+    <div class="glass-card rounded-2xl p-5 flex flex-col ${animClass}" style="animation-delay:${i*0.06}s">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-3" style="background:${p.color}15;border:1px solid ${p.color}30">
+        <i data-lucide="${p.icon}" style="width:22px;height:22px;color:${p.color}"></i>
+      </div>
+      <h3 class="font-orbit text-sm font-bold mb-1" style="color:${p.color}">${p.name}</h3>
+      <p class="text-xs text-gray-400 mb-3 flex-1">${p.desc}</p>
+      <div class="flex flex-wrap gap-1 mb-3">${p.features.map(f=>`<span class="tag">${f}</span>`).join('')}</div>
+      <div class="flex items-center justify-between mt-auto">
+        <span class="font-orbit text-sm font-bold text-white">฿${p.price.toLocaleString()}</span>
+        <button onclick="startOrder(${p.id})" class="glow-btn px-4 py-1.5 rounded-lg text-xs font-bold text-white">${t('prod_buy')}</button>
+      </div>
+    </div>`).join('')}
+  </div>
+</section>`},
+
+plans:()=>`
+<section class="px-4 max-w-6xl mx-auto py-10">
+  <h1 class="font-orbit text-2xl text-center mb-2 stagger-item anim-fade">${t('plan_title')}</h1>
+  <p class="text-xs text-gray-400 text-center mb-8 stagger-item anim-fade">${t('plan_sub')}</p>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    ${plans.map((p,i)=>`
+    <div class="glass-card rounded-2xl p-5 stagger-item anim-right relative ${p.popular?'border-neon/40':''}">
+      ${p.popular?`<div class="absolute -top-3 left-1/2 -translate-x-1/2 glow-btn px-3 py-0.5 rounded-full text-xs font-bold text-white">${t('plan_rec')}</div>`:''}
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style="background:${p.accent}15;border:1px solid ${p.accent}30">
+        <i data-lucide="${p.icon}" style="width:20px;height:20px;color:${p.accent}"></i>
+      </div>
+      <h3 class="font-orbit text-sm font-bold mb-1" style="color:${p.accent}">${p.name}</h3>
+      <p class="font-orbit text-lg font-black text-white mb-2">${p.price}</p>
+      <p class="text-xs text-gray-400 mb-3">${p.desc}</p>
+      <ul class="space-y-1.5 mb-4">${p.features.map(f=>`<li class="flex items-center gap-2 text-xs text-gray-300"><i data-lucide="check" style="width:12px;height:12px;color:${p.accent}"></i>${f}</li>`).join('')}</ul>
+      <button onclick="navigate('contact')" class="w-full py-2 rounded-lg text-xs font-bold transition ${p.popular?'glow-btn text-white':'border border-white/20 text-gray-300 hover:border-neon/40 hover:text-neon'}">${t('plan_select')}</button>
+    </div>`).join('')}
+  </div>
+</section>`,
+
+portfolio:()=>`
+<section class="px-4 max-w-6xl mx-auto py-10">
+  <h1 class="font-orbit text-2xl text-center mb-2 stagger-item anim-fade">${t('port_title')}</h1>
+  <p class="text-xs text-gray-400 text-center mb-8 stagger-item anim-fade">${t('port_sub')}</p>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    ${portfolio.map((p,i)=>`
+    <div class="glass-card rounded-2xl p-6 stagger-item anim-zoom">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style="background:${p.color}15;border:1px solid ${p.color}30">
+        <i data-lucide="folder" style="width:20px;height:20px;color:${p.color}"></i>
+      </div>
+      <h3 class="font-orbit text-sm font-bold mb-1" style="color:${p.color}">${p.name}</h3>
+      <p class="text-xs text-gray-400 mb-3">${p.desc}</p>
+      <div class="flex flex-wrap gap-1">${p.tags.map(tag=>`<span class="tag">${tag}</span>`).join('')}</div>
+    </div>`).join('')}
+  </div>
+</section>`,
+
+reviews:()=>`
+<section class="px-4 max-w-5xl mx-auto py-10">
+  <h1 class="font-orbit text-2xl text-center mb-8 stagger-item anim-fade">${t('rev_page_title')}</h1>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+    ${reviews.map((r,i)=>`
+    <div class="glass-card rounded-xl p-5 stagger-item anim-left">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="text-3xl">${r.avatar}</span>
+        <div><p class="font-bold text-sm">${r.name}</p><p class="text-xs text-gray-500">${r.bot}</p></div>
+        <div class="ml-auto flex gap-0.5">${Array(5).fill(0).map((_,j)=>`<span class="text-xs ${j<r.rating?'text-yellow-400':'text-gray-600'}">★</span>`).join('')}</div>
+      </div>
+      <p class="text-sm text-gray-300">"${r.text}"</p>
+    </div>`).join('')}
+  </div>
+  <div class="glass-card rounded-2xl p-6 stagger-item anim-up">
+    <h3 class="font-orbit text-sm mb-4 text-neon">${t('rev_write_title')}</h3>
+    <form onsubmit="submitReview(event)">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        <div><label class="text-xs text-gray-400 block mb-1">${t('lbl_name')}</label><input id="revName" required placeholder="${t('ph_name')}"></div>
+        <div><label class="text-xs text-gray-400 block mb-1">${t('lbl_bot')}</label><input id="revBot" required placeholder="${t('ph_bot')}"></div>
+      </div>
+      <div class="mb-3"><label class="text-xs text-gray-400 block mb-1">${t('lbl_score')}</label>
+        <div class="flex gap-1" id="reviewStars">${Array(5).fill(0).map((_,i)=>`<span class="text-2xl cursor-pointer text-gray-600 hover:text-yellow-400 transition" onclick="setReviewRating(${i+1})">★</span>`).join('')}</div>
+      </div>
+      <div class="mb-3"><label class="text-xs text-gray-400 block mb-1">${t('lbl_review')}</label><textarea id="revText" rows="3" required placeholder="${t('ph_review')}"></textarea></div>
+      <button type="submit" class="glow-btn px-6 py-2 rounded-lg text-sm font-bold text-white">${t('btn_submit_review')}</button>
+    </form>
+  </div>
+</section>`,
+
+faq:()=>`
+<section class="px-4 max-w-3xl mx-auto py-10">
+  <h1 class="font-orbit text-2xl text-center mb-8 stagger-item anim-fade">${t('faq_title')}</h1>
+  <div class="space-y-3">
+    ${faqs.map((f,i)=>`
+    <div class="glass-card rounded-xl stagger-item anim-down">
+      <button onclick="toggleFaq(${i})" class="w-full flex items-center justify-between p-4 text-left">
+        <span class="text-sm font-bold pr-4">${f.q}</span>
+        <i data-lucide="chevron-down" id="faqIcon${i}" style="width:16px;height:16px;flex-shrink:0" class="transition-transform text-neon"></i>
+      </button>
+      <div id="faqAnswer${i}" class="hidden px-4 pb-4 text-xs text-gray-400 leading-relaxed">${f.a}</div>
+    </div>`).join('')}
+  </div>
+</section>`,
+
+contact:()=>`
+<section class="px-4 max-w-4xl mx-auto py-10">
+  <h1 class="font-orbit text-2xl text-center mb-8 stagger-item anim-fade">${t('ct_title')}</h1>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+    ${[{icon:'message-circle',name:'Discord',val:'starlight#0001',c:'#5865F2'},{icon:'smartphone',name:'Line',val:'@starlightbot',c:'#00B900'},{icon:'facebook',name:'Facebook',val:'Starlight Bot Store',c:'#1877F2'}].map((ch,i)=>`
+    <div class="glass-card rounded-xl p-5 text-center stagger-item anim-flip">
+      <div class="w-10 h-10 mx-auto rounded-xl flex items-center justify-center mb-2" style="background:${ch.c}20;border:1px solid ${ch.c}40">
+        <i data-lucide="${ch.icon}" style="width:20px;height:20px;color:${ch.c}"></i>
+      </div>
+      <h3 class="text-sm font-bold mb-1" style="color:${ch.c}">${ch.name}</h3>
+      <p class="text-xs text-gray-400">${ch.val}</p>
+    </div>`).join('')}
+  </div>
+  <div class="glass-card rounded-2xl p-6 stagger-item anim-up">
+    <h3 class="font-orbit text-sm mb-4 text-neon">${t('ct_form_title')}</h3>
+    <form onsubmit="submitContact(event)">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        <div><label class="text-xs text-gray-400 block mb-1">${t('lbl_ct_name')}</label><input required id="ctName" placeholder="${t('ph_name')}"></div>
+        <div><label class="text-xs text-gray-400 block mb-1">${t('lbl_ct_contact')}</label><input required id="ctContact" placeholder="${t('ph_ct_contact')}"></div>
+      </div>
+      <div class="mb-3"><label class="text-xs text-gray-400 block mb-1">${t('lbl_ct_detail')}</label><textarea id="ctDetail" rows="4" required placeholder="${t('ph_ct_detail')}"></textarea></div>
+      <div class="mb-3"><label class="text-xs text-gray-400 block mb-1">${t('lbl_ct_budget')}</label><input id="ctBudget" placeholder="${t('ph_ct_budget')}"></div>
+      <button type="submit" class="glow-btn px-6 py-2 rounded-lg text-sm font-bold text-white">${t('btn_submit_ct')}</button>
+    </form>
+  </div>
+</section>`,
+
+support:()=>`
+<section class="px-4 max-w-4xl mx-auto py-10">
+  <h1 class="font-orbit text-2xl text-center mb-8 stagger-item anim-fade">${t('tk_title')}</h1>
+  <div class="glass-card rounded-2xl p-6 mb-6 stagger-item anim-up">
+    <h3 class="font-orbit text-sm mb-4 text-neon">${t('tk_new')}</h3>
+    <form onsubmit="createTicket(event)">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        <div><label class="text-xs text-gray-400 block mb-1">${t('lbl_name')}</label><input required id="tkName" placeholder="${t('ph_name')}"></div>
+        <div><label class="text-xs text-gray-400 block mb-1">${t('lbl_topic')}</label>
+          <select id="tkTopic"><option>${t('opt_tk_1')}</option><option>${t('opt_tk_2')}</option><option>${t('opt_tk_3')}</option><option>${t('opt_tk_4')}</option></select>
+        </div>
+      </div>
+      <div class="mb-3"><label class="text-xs text-gray-400 block mb-1">${t('lbl_detail')}</label><textarea id="tkDetail" rows="3" required placeholder="${t('ph_tk_detail')}"></textarea></div>
+      <button type="submit" class="glow-btn px-6 py-2 rounded-lg text-sm font-bold text-white">${t('btn_new_tk')}</button>
+    </form>
+  </div>
+  <div id="ticketList">
+    ${tickets.length?tickets.map(tk=>`
+    <div class="glass-card rounded-xl p-4 mb-3 stagger-item anim-up">
+      <div class="flex items-center justify-between mb-2">
+        <span class="font-orbit text-xs text-neon">#${tk.id}</span>
+        <span class="ticket-status status-${tk.status}">${tk.status==='pending'?t('tk_status_pending'):tk.status==='checked'?t('tk_status_checked'):t('tk_status_done')}</span>
+      </div>
+      <p class="text-sm font-bold mb-1">${tk.topic}</p>
+      <p class="text-xs text-gray-400">${tk.detail}</p>
+      ${tk.reply?`<div class="mt-2 p-2 rounded-lg bg-neon/5 border border-neon/20"><p class="text-xs text-neon">${t('tk_reply_admin')} ${tk.reply}</p></div>`:''}
+    </div>`).join(''):`<div class="text-center text-gray-500 text-sm py-8">${t('tk_empty')}</div>`}
+  </div>
+</section>`,
+
+order:(productId)=>{
+  const p=products.find(x=>x.id===productId);
+  if(!p)return`<div class="text-center py-20 text-gray-500">${t('ord_not_found')}</div>`;
+  return`
+<section class="px-4 max-w-2xl mx-auto py-10">
+  <h1 class="font-orbit text-2xl text-center mb-6 stagger-item anim-fade">${t('ord_title')}</h1>
+  <div class="glass-card rounded-2xl p-6 mb-4 stagger-item anim-fade">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:${p.color}15;border:1px solid ${p.color}30">
+        <i data-lucide="${p.icon}" style="width:22px;height:22px;color:${p.color}"></i>
+      </div>
+      <div><h3 class="font-orbit text-sm font-bold" style="color:${p.color}">${p.name}</h3><p class="text-xs text-gray-400">${p.desc}</p></div>
+      <span class="ml-auto font-orbit font-bold text-white">฿${p.price.toLocaleString()}</span>
+    </div>
+    <label class="text-xs text-gray-400 block mb-1">${t('ord_select_plan')}</label>
+    <select id="orderPlan" class="mb-4">${plans.map(pl=>`<option value="${pl.id}">${pl.name} - ${pl.price}</option>`).join('')}</select>
+  </div>
+  <div class="glass-card rounded-2xl p-6 mb-4 stagger-item anim-up">
+    <h3 class="font-orbit text-sm mb-4 text-neon">${t('ord_customer_info')}</h3>
+    <form onsubmit="submitOrder(event,${p.id})">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        <div><label class="text-xs text-gray-400 block mb-1">${t('lbl_name')}</label><input required id="ordName" placeholder="${t('ph_name')}"></div>
+        <div><label class="text-xs text-gray-400 block mb-1">${t('lbl_discord')}</label><input required id="ordDiscord" placeholder="${t('ph_discord')}"></div>
+      </div>
+      <div class="mb-3"><label class="text-xs text-gray-400 block mb-1">${t('lbl_email')}</label><input type="email" required id="ordEmail" placeholder="${t('ph_email')}"></div>
+      <div class="mb-4"><label class="text-xs text-gray-400 block mb-1">${t('lbl_note')}</label><textarea id="ordNote" rows="2" placeholder="${t('ph_note')}"></textarea></div>
+      <div class="glass-card rounded-xl p-4 mb-4 text-center border border-neon/20">
+        <p class="text-xs text-gray-400 mb-2">${t('ord_qr')}</p>
+        <div class="w-32 h-32 mx-auto bg-white rounded-xl flex items-center justify-center mb-2">
+          <svg width="100" height="100" viewBox="0 0 100 100"><rect x="10" y="10" width="25" height="25" fill="#000" rx="3"/><rect x="65" y="10" width="25" height="25" fill="#000" rx="3"/><rect x="10" y="65" width="25" height="25" fill="#000" rx="3"/><rect x="40" y="40" width="20" height="20" fill="#000" rx="2"/><rect x="15" y="15" width="15" height="15" fill="#fff" rx="2"/><rect x="70" y="15" width="15" height="15" fill="#fff" rx="2"/><rect x="15" y="70" width="15" height="15" fill="#fff" rx="2"/><rect x="19" y="19" width="7" height="7" fill="#000"/><rect x="74" y="19" width="7" height="7" fill="#000"/><rect x="19" y="74" width="7" height="7" fill="#000"/></svg>
+        </div>
+        <p class="text-xs text-neon font-orbit">PromptPay: 0XX-XXX-XXXX</p>
+        <p class="text-xs text-gray-500 mt-1">${t('ord_total')} ฿${p.price.toLocaleString()}</p>
+      </div>
+      <div class="mb-4">
+        <label class="text-xs text-gray-400 block mb-1">${t('ord_upload')}</label>
+        <div class="border-2 border-dashed border-neon/20 rounded-xl p-6 text-center cursor-pointer hover:border-neon/40 transition" onclick="document.getElementById('slipFile').click()">
+          <i data-lucide="upload" style="width:24px;height:24px;color:#00d4ff;margin:0 auto 8px"></i>
+          <p class="text-xs text-gray-400" id="slipLabel">${t('ord_upload_click')}</p>
+          <input type="file" id="slipFile" class="hidden" accept="image/*" onchange="document.getElementById('slipLabel').textContent=this.files[0]?.name||t('ord_upload_click')">
+        </div>
+      </div>
+      <button type="submit" class="w-full glow-btn py-3 rounded-xl text-sm font-bold text-white font-orbit">${t('btn_confirm')}</button>
+    </form>
+  </div>
+</section>`},
+
+admin:()=>{
+  if(!adminLoggedIn)return`
+<section class="px-4 max-w-md mx-auto py-20">
+  <div class="glass-card rounded-2xl p-8 stagger-item anim-fade text-center">
+    <div class="w-16 h-16 mx-auto rounded-2xl glow-btn flex items-center justify-center mb-4"><i data-lucide="lock" style="width:28px;height:28px;color:#fff"></i></div>
+    <h2 class="font-orbit text-lg mb-4 text-neon">Admin Panel</h2>
+    <p class="text-xs text-gray-400 mb-6">Demo Mode: กดปุ่มเพื่อเข้าสู่ระบบ</p>
+    <p class="text-xs text-yellow-400 bg-yellow-400/10 border border-yellow-400/20 rounded-lg p-3 mb-4">⚠️ นี่คือหน้า Demo — ระบบจริงต้องใช้ JWT Authentication</p>
+    <button onclick="adminLoggedIn=true;navigate('admin')" class="w-full glow-btn py-2.5 rounded-xl text-sm font-bold text-white">เข้าสู่ระบบ (Demo)</button>
+  </div>
+</section>`;
+  const totalRevenue=orders.reduce((s,o)=>s+(products.find(p=>p.id===o.productId)?.price||0),0);
+  return`
+<section class="px-4 max-w-6xl mx-auto py-10">
+  <div class="flex items-center justify-between mb-6 stagger-item anim-fade">
+    <h1 class="font-orbit text-xl text-neon">🔐 Admin Dashboard</h1>
+    <button onclick="adminLoggedIn=false;navigate('home')" class="text-xs px-3 py-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition">ออกจากระบบ</button>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+    ${[{label:'ออเดอร์',val:orders.length,icon:'shopping-bag',c:'#00d4ff'},{label:'รายได้',val:'฿'+totalRevenue.toLocaleString(),icon:'banknote',c:'#00ff88'},{label:'Tickets',val:tickets.length,icon:'ticket',c:'#7b5cff'},{label:'สินค้า',val:products.length,icon:'package',c:'#ffc107'}].map(s=>`
+    <div class="glass-card rounded-xl p-4 stagger-item anim-left">
+      <div class="flex items-center gap-2 mb-1"><i data-lucide="${s.icon}" style="width:14px;height:14px;color:${s.c}"></i><span class="text-xs text-gray-400">${s.label}</span></div>
+      <p class="font-orbit text-lg font-bold" style="color:${s.c}">${s.val}</p>
+    </div>`).join('')}
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="glass-card rounded-xl p-5 stagger-item anim-up">
+      <h3 class="font-orbit text-sm mb-3 text-neon">📦 ออเดอร์ล่าสุด</h3>
+      ${orders.length?orders.slice(-5).reverse().map(o=>{const p=products.find(x=>x.id===o.productId);return`
+      <div class="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+        <div><p class="text-sm font-bold">${p?.name||'N/A'}</p><p class="text-xs text-gray-500">${o.name} · ${o.discord}</p></div>
+        <div class="flex items-center gap-2">
+          <span class="ticket-status status-${o.status}">${o.status==='pending'?'รอตรวจ':o.status==='checked'?'ตรวจแล้ว':'เสร็จ'}</span>
+          ${o.status==='pending'?`<button onclick="updateOrderStatus(${orders.indexOf(o)},'checked')" class="text-xs text-neon hover:underline">ตรวจ</button>`:''}
+          ${o.status==='checked'?`<button onclick="updateOrderStatus(${orders.indexOf(o)},'done')" class="text-xs text-green-400 hover:underline">เสร็จ</button>`:''}
+        </div>
+      </div>`}).join(''):'<p class="text-xs text-gray-500 py-4 text-center">ยังไม่มีออเดอร์</p>'}
+    </div>
+    <div class="glass-card rounded-xl p-5 stagger-item anim-up">
+      <h3 class="font-orbit text-sm mb-3 text-neon2">🎫 Tickets ล่าสุด</h3>
+      ${tickets.length?tickets.slice(-5).reverse().map((t,i)=>`
+      <div class="py-2 border-b border-white/5 last:border-0">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-sm font-bold">#${t.id} ${t.topic}</span>
+          <span class="ticket-status status-${t.status}">${t.status==='pending'?'รอ':t.status==='checked'?'ดำเนินการ':'เสร็จ'}</span>
+        </div>
+        <p class="text-xs text-gray-400 mb-1">${t.detail.slice(0,60)}...</p>
+        <div class="flex gap-2">
+          <button onclick="replyTicket(${tickets.indexOf(t)})" class="text-xs text-neon hover:underline">ตอบกลับ</button>
+          <button onclick="closeTicket(${tickets.indexOf(t)})" class="text-xs text-green-400 hover:underline">ปิด Ticket</button>
+        </div>
+      </div>`).join(''):'<p class="text-xs text-gray-500 py-4 text-center">ยังไม่มี Ticket</p>'}
+    </div>
+  </div>
+</section>`},
+
+tos:()=>`
+<section class="px-4 max-w-3xl mx-auto py-10">
+  <h1 class="font-orbit text-2xl text-center mb-8 stagger-item anim-fade">📜 Terms of Service</h1>
+  <div class="glass-card rounded-2xl p-6 space-y-4 stagger-item anim-up text-sm text-gray-300 leading-relaxed">
+    <h3 class="font-orbit text-sm text-neon">1. ข้อตกลงทั่วไป</h3>
+    <p class="text-xs">การซื้อสินค้าจาก Starlight Bot Store ถือว่าท่านยอมรับข้อตกลงทั้งหมดนี้ สินค้าทั้งหมดเป็น Digital Product ไม่สามารถคืนเงินได้หลังจากส่งมอบ</p>
+    <h3 class="font-orbit text-sm text-neon">2. การรับประกัน</h3>
+    <p class="text-xs">บอทสำเร็จรูปรับประกัน Bug Fix 30 วัน บอทสั่งทำรับประกัน 90 วัน ไม่ครอบคลุมการแก้ไขจากผู้ใช้เอง</p>
+    <h3 class="font-orbit text-sm text-neon">3. ลิขสิทธิ์</h3>
+    <p class="text-xs">Source Code ที่ซื้อสามารถใช้งานได้เฉพาะตัว ห้ามนำไปจำหน่ายต่อ ห้ามแจกจ่ายโดยไม่ได้รับอนุญาต</p>
+    <h3 class="font-orbit text-sm text-neon">4. การชำระเงิน</h3>
+    <p class="text-xs">ชำระเงินผ่าน QR Code / PromptPay เท่านั้น ต้องอัปโหลดสลิปเพื่อยืนยัน แอดมินจะตรวจสอบภายใน 1-3 ชั่วโมง</p>
+    <h3 class="font-orbit text-sm text-neon">5. การยกเลิก</h3>
+    <p class="text-xs">สามารถยกเลิกได้ก่อนเริ่มพัฒนา หลังเริ่มพัฒนาแล้วไม่สามารถยกเลิกได้ กรณีบอทสั่งทำจะคืนเงิน 50% หากยกเลิกระหว่างพัฒนา</p>
+  </div>
+</section>`
+};
+
+// Functions
+function filterProducts(catId){
+  const buttons = document.querySelectorAll('.category-btn');
+  buttons.forEach(btn => {
+    if(btn.dataset.cat === catId) {
+       btn.className = "category-btn px-4 py-1.5 rounded-full text-xs font-bold transition glow-btn text-white";
+    } else {
+       btn.className = "category-btn px-4 py-1.5 rounded-full text-xs font-bold transition border border-white/10 text-gray-400 hover:border-neon/40 hover:text-neon";
+    }
+  });
+
+  const grid = document.getElementById('productsGrid');
+  const filtered = catId === 'all' ? products : products.filter(p => p.cat === catId);
+  const animStyles={'music':'anim-left','security':'anim-flip','workflow':'anim-zoom','custom':'anim-down','all':'anim-up'};
+  const animClass = animStyles[catId] || 'anim-up';
+  
+  grid.innerHTML = filtered.map((p,i)=>`
+    <div class="glass-card rounded-2xl p-5 flex flex-col ${animClass}" style="animation-delay:${i*0.06}s">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-3" style="background:${p.color}15;border:1px solid ${p.color}30">
+        <i data-lucide="${p.icon}" style="width:22px;height:22px;color:${p.color}"></i>
+      </div>
+      <h3 class="font-orbit text-sm font-bold mb-1" style="color:${p.color}">${p.name}</h3>
+      <p class="text-xs text-gray-400 mb-3 flex-1">${p.desc}</p>
+      <div class="flex flex-wrap gap-1 mb-3">${p.features.map(f=>`<span class="tag">${f}</span>`).join('')}</div>
+      <div class="flex items-center justify-between mt-auto">
+        <span class="font-orbit text-sm font-bold text-white">฿${p.price.toLocaleString()}</span>
+        <button onclick="startOrder(${p.id})" class="glow-btn px-4 py-1.5 rounded-lg text-xs font-bold text-white">${t('prod_buy')}</button>
+      </div>
+    </div>`).join('');
+    
+  lucide.createIcons();
+}
+
+function startOrder(id){navigate('order',id)}
+
+function submitOrder(e,productId){
+  e.preventDefault();
+  const order={
+    id:Date.now(),productId,
+    name:document.getElementById('ordName').value,
+    discord:document.getElementById('ordDiscord').value,
+    email:document.getElementById('ordEmail').value,
+    plan:document.getElementById('orderPlan').value,
+    note:document.getElementById('ordNote').value,
+    status:'pending',date:new Date().toLocaleDateString(currentLang==='th'?'th-TH':'en-US')
+  };
+  orders.push(order);
+  showToast(t('msg_order_success'));
+  navigate('home');
+}
+
+function submitContact(e){
+  e.preventDefault();
+  showToast(t('msg_submit_req'));
+  e.target.reset();
+}
+
+let reviewRating=5;
+function setReviewRating(r){
+  reviewRating=r;
+  document.querySelectorAll('#reviewStars span').forEach((s,i)=>{s.style.color=i<r?'#facc15':'#4b5563'});
+}
+
+function submitReview(e){
+  e.preventDefault();
+  reviews.push({name:document.getElementById('revName').value,avatar:'⭐',rating:reviewRating,text:document.getElementById('revText').value,bot:document.getElementById('revBot').value});
+  showToast(t('msg_submit_rev'));
+  navigate('reviews');
+}
+
+function createTicket(e){
+  e.preventDefault();
+  tickets.push({id:1000+tickets.length,name:document.getElementById('tkName').value,topic:document.getElementById('tkTopic').value,detail:document.getElementById('tkDetail').value,status:'pending',reply:null});
+  showToast(t('msg_submit_tk'));
+  navigate('support');
+}
+
+function replyTicket(idx){
+  const el=document.createElement('div');
+  el.className='modal-overlay';
+  el.onclick=e=>{if(e.target===el)el.remove()};
+  el.innerHTML=`<div class="glass-card rounded-2xl p-6 w-full max-w-md mx-4"><h3 class="font-orbit text-sm mb-3 text-neon">${t('tk_reply_admin')} #${tickets[idx].id}</h3><textarea id="replyText" rows="3" placeholder="พิมพ์ข้อความตอบกลับ..."></textarea><div class="flex gap-2 mt-3"><button onclick="saveReply(${idx})" class="glow-btn px-4 py-1.5 rounded-lg text-xs font-bold text-white">ส่ง</button><button onclick="this.closest('.modal-overlay').remove()" class="px-4 py-1.5 rounded-lg text-xs border border-white/20 text-gray-400">ยกเลิก</button></div></div>`;
+  document.body.appendChild(el);
+}
+
+function saveReply(idx){
+  tickets[idx].reply=document.getElementById('replyText').value;
+  tickets[idx].status='checked';
+  document.querySelector('.modal-overlay').remove();
+  showToast(t('msg_reply_saved'));
+  navigate('admin');
+}
+
+function closeTicket(idx){tickets[idx].status='done';showToast(t('msg_tk_closed'));navigate('admin')}
+function updateOrderStatus(idx,status){orders[idx].status=status;showToast(t('msg_ord_updated'));navigate('admin')}
+
+function toggleFaq(i){
+  const a=document.getElementById('faqAnswer'+i);
+  const ic=document.getElementById('faqIcon'+i);
+  a.classList.toggle('hidden');
+  ic.style.transform=a.classList.contains('hidden')?'':'rotate(180deg)';
+}
+
+// Stars
+function createStars(){
+  const c=document.getElementById('stars');
+  for(let i=0;i<80;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;--d:${2+Math.random()*3}s;animation-delay:${Math.random()*3}s`;
+    c.appendChild(s);
+  }
+}
+
+// Element SDK
+const defaultConfig={store_name:'Starlight Bot Store',hero_subtitle:'Premium Discord Bots — บอทคุณภาพสูง พร้อมใช้งาน ดูแลตลอด',background_color:'#0a0e27',surface_color:'#111640',text_color:'#e0e6ff',primary_action_color:'#00d4ff',secondary_action_color:'#7b5cff',font_family:'Sarabun',font_size:14};
+
+function applyConfig(cfg){
+  const c={...defaultConfig,...cfg};
+  document.body.style.background=c.background_color;
+  document.body.style.color=c.text_color;
+  document.body.style.fontFamily=`${c.font_family}, Sarabun, sans-serif`;
+  
+  const ht=document.getElementById('heroTitle');
+  if(ht)ht.textContent=c.store_name;
+  const hs=document.getElementById('heroSub');
+  if(hs)hs.textContent=c.hero_subtitle;
+  const nt=document.getElementById('navTitle');
+  if(nt)nt.textContent=c.store_name;
+
+  document.querySelectorAll('.font-orbit').forEach(el=>{el.style.fontFamily=`Orbitron, ${c.font_family}, sans-serif`});
+  document.querySelectorAll('.glass-card').forEach(el=>{el.style.background=c.surface_color+'99';el.style.borderColor=c.primary_action_color+'25'});
+  document.querySelectorAll('.glow-btn').forEach(el=>{el.style.background=`linear-gradient(135deg,${c.primary_action_color},${c.secondary_action_color})`});
+
+  const base=c.font_size||14;
+  document.querySelectorAll('p,span,a,li,label').forEach(el=>{if(!el.closest('.font-orbit'))el.style.fontSize=`${base}px`});
+}
+
+if(window.elementSdk){
+  window.elementSdk.init({
+    defaultConfig,
+    onConfigChange:async(cfg)=>applyConfig(cfg),
+    mapToCapabilities:(cfg)=>({
+      recolorables:[
+        {get:()=>cfg.background_color||defaultConfig.background_color,set:v=>{cfg.background_color=v;window.elementSdk.setConfig({background_color:v})}},
+        {get:()=>cfg.surface_color||defaultConfig.surface_color,set:v=>{cfg.surface_color=v;window.elementSdk.setConfig({surface_color:v})}},
+        {get:()=>cfg.text_color||defaultConfig.text_color,set:v=>{cfg.text_color=v;window.elementSdk.setConfig({text_color:v})}},
+        {get:()=>cfg.primary_action_color||defaultConfig.primary_action_color,set:v=>{cfg.primary_action_color=v;window.elementSdk.setConfig({primary_action_color:v})}},
+        {get:()=>cfg.secondary_action_color||defaultConfig.secondary_action_color,set:v=>{cfg.secondary_action_color=v;window.elementSdk.setConfig({secondary_action_color:v})}}
+      ],
+      borderables:[],
+      fontEditable:{get:()=>cfg.font_family||defaultConfig.font_family,set:v=>{cfg.font_family=v;window.elementSdk.setConfig({font_family:v})}},
+      fontSizeable:{get:()=>cfg.font_size||defaultConfig.font_size,set:v=>{cfg.font_size=v;window.elementSdk.setConfig({font_size:v})}}
+    }),
+    mapToEditPanelValues:(cfg)=>new Map([
+      ['store_name',cfg.store_name||defaultConfig.store_name],
+      ['hero_subtitle',cfg.hero_subtitle||defaultConfig.hero_subtitle]
+    ])
+  });
+}
+
+createStars();
+navigate('home');
+lucide.createIcons();
+</script>
+ <script src="/socket.io/socket.io.js"></script>
+ <script src="/js/socket-client.js"></script></body>
+</html>

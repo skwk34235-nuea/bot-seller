@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en" class="h-full">
+  <%- include('../../partials/head') %>
+  <body class="min-h-full bg-deep text-white font-sara">
+    <div class="page-shell">
+      <%- include('../../partials/navbar') %>
+      <%- include('../../partials/flash') %>
+      <main class="mx-auto max-w-7xl px-4 py-16">
+        <div class="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+          <section class="glass-card rounded-[32px] p-8">
+            <p class="text-sm uppercase tracking-[0.2em] text-neon/80">User area</p>
+            <h1 class="mt-4 font-orbit text-4xl">Welcome, <%= sessionUser.name %></h1>
+            <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-300">This is the normal user dashboard. It stays separate from admin tools and is ready for orders, support tickets, and customer-specific realtime updates.</p>
+            <div class="mt-8 grid gap-4 md:grid-cols-3">
+              <div class="rounded-[24px] border border-white/10 bg-white/5 p-5">
+                <p class="text-xs uppercase tracking-[0.16em] text-slate-400">Email</p>
+                <p class="mt-3 text-sm text-white"><%= sessionUser.email %></p>
+              </div>
+              <div class="rounded-[24px] border border-white/10 bg-white/5 p-5">
+                <p class="text-xs uppercase tracking-[0.16em] text-slate-400">Role</p>
+                <p class="mt-3 text-sm text-white"><%= sessionUser.role %></p>
+              </div>
+              <div class="rounded-[24px] border border-white/10 bg-white/5 p-5">
+                <p class="text-xs uppercase tracking-[0.16em] text-slate-400">Orders</p>
+                <p class="mt-3 text-sm text-white"><%= orders.length %> active</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="glass-card rounded-[32px] p-8">
+            <p class="text-sm uppercase tracking-[0.2em] text-neon/80">Realtime test</p>
+            <h2 class="mt-4 font-orbit text-2xl">Send a live message</h2>
+            <form id="realtimeForm" class="mt-6 space-y-4">
+              <textarea id="realtimeMessage" class="auth-input min-h-[120px]" placeholder="Type a message to emit through Socket.IO"></textarea>
+              <button type="submit" class="w-full rounded-2xl bg-gradient-to-r from-neon to-neon2 px-4 py-3 text-sm font-semibold text-white">Send realtime message</button>
+            </form>
+            <div id="realtimeLog" class="mt-6 rounded-[24px] border border-white/10 bg-black/10 p-4 text-sm leading-7 text-slate-300">
+              Waiting for events...
+            </div>
+          </section>
+        </div>
+
+        <div class="mt-8 grid gap-6 lg:grid-cols-[1fr_1fr]">
+          <section class="glass-card rounded-[28px] p-6">
+            <div class="flex items-center justify-between">
+              <h2 class="font-orbit text-2xl">Recent orders</h2>
+              <a href="/user/profile" class="rounded-xl border border-neon/30 px-3 py-2 text-xs font-semibold text-neon hover:bg-neon/10">Profile</a>
+            </div>
+            <div class="mt-5 space-y-3">
+              <% orders.forEach((order) => { %>
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <div class="flex items-center justify-between gap-4">
+                    <div>
+                      <p class="text-sm font-semibold text-white"><%= order.item %></p>
+                      <p class="mt-1 text-sm text-slate-400"><%= order.code %></p>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-xs uppercase tracking-[0.16em] text-neon"><%= order.status %></p>
+                      <p class="mt-1 text-xs text-slate-400"><%= order.updatedAt %></p>
+                    </div>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          </section>
+
+          <section class="glass-card rounded-[28px] p-6">
+            <h2 class="font-orbit text-2xl">Featured products</h2>
+            <div class="mt-5 space-y-3">
+              <% featuredProducts.forEach((product) => { %>
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <p class="text-sm font-semibold text-white"><%= product.name %></p>
+                  <p class="mt-1 text-sm text-slate-400"><%= product.description %></p>
+                  <p class="mt-3 text-xs uppercase tracking-[0.16em] text-neon"><%= product.price.toLocaleString() %> THB</p>
+                </div>
+              <% }) %>
+            </div>
+          </section>
+        </div>
+      </main>
+      <%- include('../../partials/footer') %>
+      <%- include('../../partials/socket-badge') %>
+      <%- include('../../partials/scripts') %>
+      <script>
+        const realtimeForm = document.getElementById('realtimeForm');
+        const realtimeMessage = document.getElementById('realtimeMessage');
+        const realtimeLog = document.getElementById('realtimeLog');
+
+        realtimeForm.addEventListener('submit', function (event) {
+          event.preventDefault();
+
+          if (!window.appSocket || !realtimeMessage.value.trim()) {
+            return;
+          }
+
+          window.appSocket.emit('chat:message', { text: realtimeMessage.value.trim() });
+          realtimeMessage.value = '';
+        });
+
+        document.addEventListener('socket:message', function (event) {
+          const payload = event.detail;
+          realtimeLog.textContent = `[${payload.sentAt}] ${payload.user}: ${payload.text}`;
+        });
+      </script>
+    </div>
+  </body>
+</html>

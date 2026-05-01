@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en" class="h-full">
+  <%- include('../partials/head') %>
+  <body class="min-h-full bg-deep text-white font-sara">
+    <div class="page-shell">
+      <%- include('../partials/navbar') %>
+      <main class="mx-auto max-w-5xl px-4 py-16">
+        <div class="glass-card rounded-[32px] p-8">
+          <p class="text-sm uppercase tracking-[0.2em] text-neon/80" data-i18n="nav_contact">Contact</p>
+          <h1 class="mt-4 font-orbit text-4xl" data-i18n="ct_title">Let us build your realtime storefront</h1>
+          <div class="mt-8 grid gap-6 md:grid-cols-2">
+            <div class="space-y-4 text-sm leading-7 text-slate-300">
+              <p>Discord: starlight#0001</p>
+              <p>Line: @starlightbot</p>
+              <p>Email: support@starlight.local</p>
+            </div>
+            <div class="rounded-[28px] border border-white/10 bg-black/10 p-6 text-sm text-slate-300">
+              Login, register, dashboard, and realtime Socket.IO connection are already wired in this starter so you can continue with orders, tickets, or admin notifications next.
+            </div>
+          </div>
+        </div>
+      </main>
+      <%- include('../partials/footer') %>
+      <%- include('../partials/socket-badge') %>
+      <%- include('../partials/scripts') %>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en" class="h-full">
+  <%- include('../partials/head') %>
+  <body class="min-h-full bg-deep text-white font-sara">
+    <div class="auth-shell">
+      <%- include('../partials/navbar') %>
+      <%- include('../partials/flash') %>
+      <main class="mx-auto flex min-h-[calc(100vh-80px)] max-w-7xl items-center px-4 py-12">
+        <%- include('../partials/auth-form', {
+          mode: 'login',
+          eyebrow: 'Access account',
+          title: 'Login',
+          description: 'Continue to your dashboard, track realtime activity, and manage your account.',
+          action: '/login',
+          submitLabel: 'Login',
+          footerText: 'Need an account?',
+          footerLink: '/register',
+          footerLinkLabel: 'Register'
+        }) %>
+      </main>
+      <%- include('../partials/scripts') %>
+    </div>
+  </body>
+</html>

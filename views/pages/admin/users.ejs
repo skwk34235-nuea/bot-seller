@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en" class="h-full">
+  <%- include('../../partials/head') %>
+  <body class="min-h-full bg-deep text-white font-sara">
+    <div class="page-shell">
+      <%- include('../../partials/navbar') %>
+      <main class="mx-auto max-w-7xl px-4 py-16">
+        <div class="mb-8">
+          <p class="text-sm uppercase tracking-[0.2em] text-amber-300">Admin area</p>
+          <h1 class="mt-4 font-orbit text-4xl">User Management</h1>
+        </div>
+        <section class="glass-card rounded-[28px] p-6">
+          <div class="grid gap-3">
+            <% users.forEach((user) => { %>
+              <div class="grid gap-2 rounded-2xl border border-white/10 bg-white/5 p-4 md:grid-cols-[1fr_1fr_auto] md:items-center">
+                <div>
+                  <p class="text-sm font-semibold text-white"><%= user.name %></p>
+                  <p class="text-sm text-slate-400"><%= user.email %></p>
+                </div>
+                <p class="text-xs uppercase tracking-[0.16em] text-slate-300"><%= user.role %></p>
+                <button class="rounded-xl border border-neon/30 px-3 py-2 text-xs font-semibold text-neon hover:bg-neon/10">Manage</button>
+              </div>
+            <% }) %>
+          </div>
+        </section>
+      </main>
+      <%- include('../../partials/footer') %>
+      <%- include('../../partials/socket-badge') %>
+      <%- include('../../partials/scripts') %>
+    </div>
+  </body>
+</html>

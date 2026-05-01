@@ -1,0 +1,27 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= pageTitle ? `${pageTitle} | ${appName}` : appName %></title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            orbit: ['Orbitron', 'sans-serif'],
+            sara: ['Sarabun', 'sans-serif']
+          },
+          colors: {
+            neon: '#00d4ff',
+            neon2: '#7b5cff',
+            deep: '#0a0e27',
+            deep2: '#111640'
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="/styles/app.css">
+</head>

@@ -1,0 +1,38 @@
+<nav class="sticky top-0 z-50 border-b border-white/10 bg-deep/85 backdrop-blur-xl">
+  <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
+    <a href="/" class="flex items-center gap-3">
+      <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-neon to-neon2 text-white shadow-[0_0_30px_rgba(0,212,255,0.25)]">
+        <i data-lucide="bot" class="h-5 w-5"></i>
+      </span>
+      <span class="font-orbit text-sm font-bold text-neon"><%= appName %></span>
+    </a>
+
+    <div class="hidden items-center gap-6 text-sm text-slate-300 md:flex">
+      <a href="/" data-i18n="nav_home" class="<%= currentPath === '/' ? 'text-neon' : 'hover:text-neon' %>">Home</a>
+      <a href="/products" data-i18n="nav_products" class="<%= currentPath === '/products' ? 'text-neon' : 'hover:text-neon' %>">Products</a>
+      <a href="/plans" data-i18n="nav_plans" class="<%= currentPath === '/plans' ? 'text-neon' : 'hover:text-neon' %>">Plans</a>
+      <a href="/reviews" data-i18n="nav_reviews" class="<%= currentPath === '/reviews' ? 'text-neon' : 'hover:text-neon' %>">Reviews</a>
+      <a href="/faq" data-i18n="nav_faq" class="<%= currentPath === '/faq' ? 'text-neon' : 'hover:text-neon' %>">FAQ</a>
+      <a href="/contact" data-i18n="nav_contact" class="<%= currentPath === '/contact' ? 'text-neon' : 'hover:text-neon' %>">Contact</a>
+      <% if (sessionUser && sessionUser.role === 'admin') { %>
+        <a href="/admin/dashboard" data-i18n="nav_admin" class="<%= currentPath.startsWith('/admin') ? 'text-amber-300' : 'hover:text-amber-300' %>">Admin</a>
+      <% } %>
+      <% if (sessionUser && sessionUser.role !== 'admin') { %>
+        <a href="/user/dashboard" class="<%= currentPath.startsWith('/user') ? 'text-neon' : 'hover:text-neon' %>">User</a>
+      <% } %>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button onclick="toggleLang()" class="text-xs px-3 py-1.5 rounded-lg border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 transition flex items-center gap-1 font-bold"><i data-lucide="globe" style="width:14px;height:14px;"></i> <span id="langLabel">EN</span></button>
+      <% if (sessionUser) { %>
+        <a href="<%= sessionUser.role === 'admin' ? '/admin/dashboard' : '/user/dashboard' %>" class="rounded-xl border border-neon/30 px-3 py-2 text-xs font-semibold text-neon hover:bg-neon/10">Dashboard</a>
+        <form method="post" action="/logout">
+          <button type="submit" class="rounded-xl bg-neon2/20 px-3 py-2 text-xs font-semibold text-purple-200 hover:bg-neon2/30">Logout</button>
+        </form>
+      <% } else { %>
+        <a href="/login" class="rounded-xl border border-neon/30 px-3 py-2 text-xs font-semibold text-neon hover:bg-neon/10">Login</a>
+        <a href="/register" class="rounded-xl bg-neon2/20 px-3 py-2 text-xs font-semibold text-purple-200 hover:bg-neon2/30">Register</a>
+      <% } %>
+    </div>
+  </div>
+</nav>
